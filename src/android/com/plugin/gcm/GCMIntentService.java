@@ -9,6 +9,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -108,11 +109,16 @@ public class GCMIntentService extends GCMBaseIntentService {
 				.setContentIntent(contentIntent)
 				.setAutoCancel(true);
 
-		String message = extras.getString("message");
-		if (message != null) {
-			mBuilder.setContentText(message);
-		} else {
-			mBuilder.setContentText("<missing message content>");
+		String message = extras.getString("message", "<missing message content>");
+		mBuilder.setContentText(message);
+		//Android 4.1 (Jelly Bean) added support for large-format notifications
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+		}
+
+		String subtext = extras.getString("subtext");
+		if (subtext != null) {
+			mBuilder.setSubText(subtext);
 		}
 
 		String msgcnt = extras.getString("msgcnt");
